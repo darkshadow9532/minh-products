@@ -1,0 +1,156 @@
+<html>
+    <head>
+        <%- include("../header.ejs") %>
+        <script src="/js/product/ModelProduct.js"></script>
+        <script src="/js/product/ModelFile.js"></script>
+    </head>
+    <body class="container-fluid">
+        <div>
+            <%- include("../menu.ejs"); %>
+        </div>
+        <%- include("parse_excel.ejs") %>
+        <div id="app">
+            <div class="p-3">
+                <select class="form-control" v-model="slcFile" @change="getProductsOfFile();">
+                    <option v-for="file in models.files" :value="file">{{file.getName()}}</option>
+                </select>
+            </div>
+            <div class="p-3">
+                <h3>{{slcFile.getName()}}</h3>                
+                <button v-for="sheet, index in slcFile.getData()" class="btn btn-secondary mr-2" @click="slcSheet = sheet">{{index}}</button>
+            </div>
+            <div>
+                <h4>{{slcSheet.name}}</h4>
+                <table class="table table-bordered">
+                    <template v-for="(row, r) in slcSheet.data">
+                        <tr :class="{ 'table-primary' : (r == header_row)}">
+                            <td>
+                                <button @click="setHeaderRow(r)">H</button>
+                            </td>
+                            <template v-for="(col, c) in row">
+                                <td :class="">{{col}}
+                                    <span v-if=" ( r == header_row )">
+                                        <select class="form-control" @change="map_attribute($event, c)">
+                                            <option value="">Chọn</option>
+                                            <option v-for="attr in attributes_cols_map">{{ attr.attribute }}
+                                            </option>
+                                        </select>
+                                    </span>
+                                </td>
+                            </template>
+                            
+                            <td>
+                                <template v-if="checkRowCreated(r)">
+                                    <button @click="addProduct(row, attributes_cols_map, r); hide_button($event)" >P</button>
+                                </template>                                
+                            </td>
+                        </tr>
+                    </template>                    
+                </table>
+            </div>
+        </div>
+        <!-- <div class="row">
+            <div class="col">
+                <h2>TEMP</h2>
+            </div>
+            <div class="col">
+                <h2>MERGE & CREATE</h2>
+            </div>
+            <div class="col">
+                <h2>EDIT</h2>
+            </div>
+        </div> -->
+    </body>
+    <script>
+        
+        var app = new Vue({
+            el: "#app",
+            data: {
+                header_row: -1,
+                attributes_cols_map: [{
+                    attribute: "name",
+                    col: -1
+                },{
+                    attribute: "description",
+                    col: -1
+                },{
+                    attribute: 'price',
+                    col: -1
+                }],
+                product_models: new CretaProductsV2(),
+                models: new CretaFiles(),
+                slcFile: new CretaFile(),
+                slcSheet: {name: "", data: []},
+            },
+            methods: {
+                show: function(){
+
+                },
+                setHeaderRow: function(r){
+                    this.header_row = r;
+                },
+                map_attribute: function(event, c){
+                    this.attributes_cols_map.forEach( e => {
+                        if ( event.target.value == e.attribute){
+                            e.col = c;
+                        }
+                    })
+                    console.log(this.attributes_cols_map);
+                },
+                addProduct: function(row, attributes_cols_map, r){
+                    var filename = this.slcFile.getName();
+                    var sheet = this.slcSheet.name;
+                    var source = {
+                        filename: filename,
+                        sheet: sheet,
+                        row: r,
+                        type: "EXCEL"
+                    }
+                    var p = new CretaProduct();
+                    p.set_temp_product(row, attributes_cols_map);
+                    p.set("source", source);
+                    console.log(p);
+                    p.save({}, {
+                        success: function(r){
+                            console.log("Add Product Done!")
+                        }
+                    });
+                },
+                
+                getProductsOfFile: function(){
+                    var filename = this.slcFile.getName()
+                    
+                    this.product_models.getProductsOfFile(filename);
+                },
+                checkRowCreated: function(row){
+                    var result = true;
+                    this.product_models.products.forEach(p => {
+                        try {
+                            var source = p.get("source");
+                            if (source.row == row){
+                                result = false;
+                            }
+                        } catch(e) {
+                        }
+                    })
+
+                    return result;
+                },
+                hide_button: function(event){
+                    if (this.header_row < 0){
+                        alert("Chọn Header trước!")
+                    } else{
+                        event.target.hidden = true;
+                    }
+                }
+            },
+            created: function(){
+
+            }
+        })
+
+        $(document).ready(function(){
+            
+        })
+    </script>
+</html>
