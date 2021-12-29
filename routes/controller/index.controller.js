@@ -7,6 +7,10 @@ exports.dashboard = function(req, res, next) {
     res.render('product/dashboard', { title: 'Products Creta' });
 }
 
+exports.detail = (req, res) => {
+    res.render('product/detail');
+}
+
 exports.upload = (req, res, next) => {
     let sampleFile;
     let uploadPath;

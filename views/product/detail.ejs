@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <%- include("../header.ejs") %>
+        <script src="/js/nicEdit.js"></script>
+        <script src="/js/product/ModelProduct.js"></script>
+        <script src="/js/product/ModelFile.js"></script>
+        <script type="text/javascript">
+            bkLib.onDomLoaded(function() {
+                new nicEditor({fullPanel : true}).panelInstance('area2');
+
+            });
+        </script>        
+    </head>
+    <body class="container-fluid">
+        <div>
+            <%- include("../menu.ejs"); %>
+        </div>
+        
+        <div id="app">            
+            <table class="table table-bordered">
+                <tr>
+                    <td>Tên sản phẩm: </td>
+                    <td><input :value="a"></td>
+                </tr>
+                <tr>
+                    <td>Mô tả: </td>
+                    <td><textarea class="form-control" id="area2">{{ description }}</textarea></td>
+                </tr>
+                <tr>
+                    <td>Link ảnh: </td>
+                </tr>
+                <tr>
+                    <td>Phân loại: </td>
+                    <td><input type="radio" value="TEMP" v-model="b">   <input type="radio" value="BASIC" v-model="b"></td>
+                </tr>
+            </table>
+            
+        </div>
+        <img id="imageid" src="https://kbvision.vn/wp-content/uploads/2021/05/KX-A7104SD6.png">
+        <script>
+            function getBase64Image(img) {
+                var canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+                var dataURL = canvas.toDataURL("image/png");
+                return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+            }
+
+            function getBase64FromImageUrl(URL) {
+                var img = new Image();
+                img.setAttribute('crossOrigin', 'anonymous');
+                img.src = URL;
+                img.onload = function() {
+                    var canvas = document.createElement("canvas");
+                    canvas.width = this.width;
+                    canvas.height = this.height;
+
+                    var ctx = canvas.getContext("2d");
+                    ctx.drawImage(this, 0, 0);
+
+                    var dataURL = canvas.toDataURL("image/png");
+
+                    alert(dataURL.replace(/^data:image\/(png|jpg);base64,/, ""));
+
+                };
+                console.log(img);
+                return img;
+            }
+
+            // var base64 = getBase64Image(document.getElementById("imageid"));
+            // console.log(base64);
+            
+            var ti = getBase64FromImageUrl("https://kbvision.vn/wp-content/uploads/2021/05/KX-A7104SD6.png");
+
+            var app = new Vue({
+                el: "#app",
+                data: {
+                    description: "",
+                    a: "",
+                    b: ""
+
+                },
+                created(){
+                    this.description = "Hello";
+                    
+                    // var area2 = new nicEditor({fullPanel : true}).panelInstance('area2',{hasPanel : true});
+                }
+            })
+        </script>
+    </body>
+
+</html>
