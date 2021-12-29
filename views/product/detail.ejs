@@ -20,7 +20,7 @@
             <table class="table table-bordered">
                 <tr>
                     <td>Tên sản phẩm: </td>
-                    <td><input :value="a"></td>
+                    <td><input :value="product_model.getName()" class="form-control"></td>
                 </tr>
                 <tr>
                     <td>Mô tả: </td>
@@ -28,15 +28,16 @@
                 </tr>
                 <tr>
                     <td>Link ảnh: </td>
+                    <td><input class="form-control" :value="product_model.getImages()"><button class="btn btn-warning" @click="test_image_source = image_source">TEST</button></td>
                 </tr>
                 <tr>
                     <td>Phân loại: </td>
                     <td><input type="radio" value="TEMP" v-model="b">   <input type="radio" value="BASIC" v-model="b"></td>
                 </tr>
             </table>
-            
+            <img id="imageid" :src="test_image_source">
         </div>
-        <img id="imageid" src="https://kbvision.vn/wp-content/uploads/2021/05/KX-A7104SD6.png">
+        
         <script>
             function getBase64Image(img) {
                 var canvas = document.createElement("canvas");
@@ -69,22 +70,82 @@
                 return img;
             }
 
+            async function downloadImage(imageSrc) {
+                const image = await fetch(imageSrc)
+                const imageBlog = await image.blob()
+                const imageURL = URL.createObjectURL(imageBlog)
+                console.log(image);
+                const link = document.createElement('a')
+                link.href = imageURL
+                link.download = 'image file name here'
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+            }
+            // downloadImage("https://kbvision.vn/wp-content/uploads/2021/05/KX-A7104SD6.png");
+
             // var base64 = getBase64Image(document.getElementById("imageid"));
             // console.log(base64);
             
-            var ti = getBase64FromImageUrl("https://kbvision.vn/wp-content/uploads/2021/05/KX-A7104SD6.png");
+            // var ti = getBase64FromImageUrl("https://kbvision.vn/wp-content/uploads/2021/05/KX-A7104SD6.png");
+            var downloadedImg;
+            var imageBox;
+            function startDownload() {
+                let imageURL = "https://dahuasecurity.s3.ap-southeast-1.amazonaws.com/uploads%2Fimage%2F20211223%2FHDW1230DT-STW_45Left1_thumb.png";
 
+                downloadedImg = new Image;
+                downloadedImg.crossOrigin = "Anonymous";
+                downloadedImg.addEventListener("load", imageReceived, false);
+                downloadedImg.src = imageURL;
+                console.log(downloadedImg);
+            }
+
+            function imageReceived() {
+                let canvas = document.createElement("canvas");
+                let context = canvas.getContext("2d");
+
+                canvas.width = downloadedImg.width;
+                canvas.height = downloadedImg.height;
+
+                context.drawImage(downloadedImg, 0, 0);
+                // imageBox.appendChild(canvas);
+
+                try {
+                    localStorage.setItem("saved-image-example", canvas.toDataURL("image/png"));
+                }
+                catch(err) {
+                    console.log("Error: " + err);
+                }
+            }
+            // startDownload();
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const params = Object.fromEntries(urlSearchParams.entries());
+            if(!params.id){
+                alert("Id product không được trống!");
+            }
             var app = new Vue({
                 el: "#app",
                 data: {
                     description: "",
                     a: "",
-                    b: ""
-
+                    b: "",                    
+                    test_image_source: "",
+                    image_source: "",
+                    product_model: new CretaProduct(params.id ? {id: params.id} : {})
+                },
+                method: {
+                    onUpdateData: function(){
+                        this.description = this.product_model.getDescription();
+                        this.$forceUpdate();
+                    }
                 },
                 created(){
-                    this.description = "Hello";
+                    var that = this;
                     
+                    this.product_model.fetch({success: ()=>{
+                        this.description = this.product_model.getDescription();
+                        this.$forceUpdate();
+                    }});
                     // var area2 = new nicEditor({fullPanel : true}).panelInstance('area2',{hasPanel : true});
                 }
             })

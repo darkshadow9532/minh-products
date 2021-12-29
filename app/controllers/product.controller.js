@@ -4,7 +4,7 @@ const History = db.histories;
 var nameController = "Product";
 
 function createObj (data) {
-    var objArray = ['code', 'description', 'attributes', 'name', 'type', 'source', 'status', 'price'];
+    var objArray = ['code', 'description', 'attributes', 'name', 'type', 'source', 'status', 'price', 'images'];
     var a = {};
     objArray.forEach(function(e){
         a[e] = data[e];
@@ -101,7 +101,21 @@ exports.delete = (req, res) => {
 
 // Delete all Tutorials from the database.
 exports.deleteAll = (req, res) => {
-  
+//   Model.deleteMany().then(data => {
+//     if(!data){
+//         res.status(400).send({
+//             message: "Error - not remove"
+//         })
+//     } else {
+//         res.send({
+//             message: "Ok - success"
+//         })
+//     }
+//   }).catch(e=>{
+//     res.status(500).send({
+//         message: "Cannot delete"
+//     })
+//     }) 
 };
 
 // Find all published Tutorials

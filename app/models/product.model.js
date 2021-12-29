@@ -8,7 +8,8 @@ module.exports = mongoose => {
             type: String,
             source: Object,
             price: Number,
-            status: String
+            status: String,
+            images: Array
         },
         { 
             timestamps: true 

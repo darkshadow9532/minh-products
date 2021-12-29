@@ -27,6 +27,18 @@ class CretaProduct extends Product {
         })
         this.set("type", "TEMP");
     }
+    getName = () => {
+        return this.get("name") || "";
+    }
+    getDescription = () => {
+        return this.get("description") || "";
+    }
+    getPrice = () => {
+        return this.get("price") || "";
+    }
+    getImages = () => {
+        return this.get("images") || [];
+    }
 }
 
 var CretaProducts = Backbone.Collection.extend({
