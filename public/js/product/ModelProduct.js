@@ -39,6 +39,9 @@ class CretaProduct extends Product {
     getImages = () => {
         return this.get("images") || [];
     }
+    getType = () => {
+        return this.get("type" || "");
+    }
 }
 
 var CretaProducts = Backbone.Collection.extend({

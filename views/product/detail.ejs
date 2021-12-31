@@ -5,10 +5,10 @@
         <script src="/js/product/ModelProduct.js"></script>
         <script src="/js/product/ModelFile.js"></script>
         <script type="text/javascript">
-            bkLib.onDomLoaded(function() {
-                new nicEditor({fullPanel : true}).panelInstance('area2');
+            // bkLib.onDomLoaded(function() {
+            //     var product_description = new nicEditor({fullPanel : true}).panelInstance('product_description');
 
-            });
+            // });
         </script>        
     </head>
     <body class="container-fluid">
@@ -16,108 +16,78 @@
             <%- include("../menu.ejs"); %>
         </div>
         
-        <div id="app">            
+        <div id="app" class="m-2">            
             <table class="table table-bordered">
                 <tr>
                     <td>Tên sản phẩm: </td>
-                    <td><input :value="product_model.getName()" class="form-control"></td>
+                    <td><input class="form-control" v-model="product.name"></td>
+                </tr>
+                <tr>
+                    <td>Giá sản phẩm: </td>
+                    <td><input class="form-control" v-model="product.price" type="number"></td>
                 </tr>
                 <tr>
                     <td>Mô tả: </td>
-                    <td><textarea class="form-control" id="area2">{{ description }}</textarea></td>
+                    <td>
+                        <textarea class="form-control" cols="100" rows="5" id="product_description"></textarea>
+                        </br>
+                        <button onClick="toggleArea2();">Chỉnh sửa với Editor</button>
+                    </td>
                 </tr>
                 <tr>
                     <td>Link ảnh: </td>
-                    <td><input class="form-control" :value="product_model.getImages()"><button class="btn btn-warning" @click="test_image_source = image_source">TEST</button></td>
+                    <td>
+                        <template v-for="image in product.images">
+                            <div class="text-center alert alert-info">
+                                <strong>{{ image.url }}</strong>
+                                <button @click="delete_image_url(image.url)">&times;</button>
+                                
+                            </div>
+                            
+                        </template>
+                        <input v-model="new_url" class="form-control m-2" @keyup.enter="add_image_url(new_url)">
+                        <button class="btn btn-warning" @click="test_image_url(new_url)">Test</button>
+                        <!-- <span v-model="test_status" :class="{ 'text-success' : test_status, 'text-danger' : !test_status }">{{ test_status ? "OK!" : "FAIL" }}</span> -->
+                        <button class="btn btn-success" @click="add_image_url(new_url)">Thêm</button>
+                        
+                    </td>
                 </tr>
                 <tr>
                     <td>Phân loại: </td>
-                    <td><input type="radio" value="TEMP" v-model="b">   <input type="radio" value="BASIC" v-model="b"></td>
+                    <td><input type="radio" value="TEMP" v-model="product.type"> TEMP  <input type="radio" value="BASIC" v-model="product.type"> BASIC </td>
                 </tr>
             </table>
-            <img id="imageid" :src="test_image_source">
+
+            <div>
+                <button @click="save_product()">Lưu</button>
+                <button @click="delete_product()">Xóa</button>
+            </div>
+            <img id="imageid" :src="test_url" onload="doing()" onerror="fail()">
         </div>
         
         <script>
-            function getBase64Image(img) {
-                var canvas = document.createElement("canvas");
-                canvas.width = img.width;
-                canvas.height = img.height;
-                var ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0);
-                var dataURL = canvas.toDataURL("image/png");
-                return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+            var product_description;
+            var nicE;
+            function toggleArea2() {
+                if(!product_description) {
+                    product_description = new nicEditor({fullPanel : true}).panelInstance('product_description',{hasPanel : true});
+                    nicE = new nicEditors.findEditor('product_description');
+                } else {
+                    
+                }
             }
 
-            function getBase64FromImageUrl(URL) {
-                var img = new Image();
-                img.setAttribute('crossOrigin', 'anonymous');
-                img.src = URL;
-                img.onload = function() {
-                    var canvas = document.createElement("canvas");
-                    canvas.width = this.width;
-                    canvas.height = this.height;
-
-                    var ctx = canvas.getContext("2d");
-                    ctx.drawImage(this, 0, 0);
-
-                    var dataURL = canvas.toDataURL("image/png");
-
-                    alert(dataURL.replace(/^data:image\/(png|jpg);base64,/, ""));
-
-                };
-                console.log(img);
-                return img;
+            function doing(){
+                console.log("loaded!")
+                // alert("OK!")
             }
 
-            async function downloadImage(imageSrc) {
-                const image = await fetch(imageSrc)
-                const imageBlog = await image.blob()
-                const imageURL = URL.createObjectURL(imageBlog)
-                console.log(image);
-                const link = document.createElement('a')
-                link.href = imageURL
-                link.download = 'image file name here'
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
+            function fail(){
+                // alert("Link không đúng! Kiểm tra lại");
             }
-            // downloadImage("https://kbvision.vn/wp-content/uploads/2021/05/KX-A7104SD6.png");
-
-            // var base64 = getBase64Image(document.getElementById("imageid"));
-            // console.log(base64);
             
-            // var ti = getBase64FromImageUrl("https://kbvision.vn/wp-content/uploads/2021/05/KX-A7104SD6.png");
-            var downloadedImg;
-            var imageBox;
-            function startDownload() {
-                let imageURL = "https://dahuasecurity.s3.ap-southeast-1.amazonaws.com/uploads%2Fimage%2F20211223%2FHDW1230DT-STW_45Left1_thumb.png";
-
-                downloadedImg = new Image;
-                downloadedImg.crossOrigin = "Anonymous";
-                downloadedImg.addEventListener("load", imageReceived, false);
-                downloadedImg.src = imageURL;
-                console.log(downloadedImg);
-            }
-
-            function imageReceived() {
-                let canvas = document.createElement("canvas");
-                let context = canvas.getContext("2d");
-
-                canvas.width = downloadedImg.width;
-                canvas.height = downloadedImg.height;
-
-                context.drawImage(downloadedImg, 0, 0);
-                // imageBox.appendChild(canvas);
-
-                try {
-                    localStorage.setItem("saved-image-example", canvas.toDataURL("image/png"));
-                }
-                catch(err) {
-                    console.log("Error: " + err);
-                }
-            }
-            // startDownload();
+           
+            
             const urlSearchParams = new URLSearchParams(window.location.search);
             const params = Object.fromEntries(urlSearchParams.entries());
             if(!params.id){
@@ -126,24 +96,79 @@
             var app = new Vue({
                 el: "#app",
                 data: {
-                    description: "",
-                    a: "",
-                    b: "",                    
-                    test_image_source: "",
+                    product: {
+                        name: "",
+                        price: 0,
+                        description: "",                        
+                        images: [],
+                        type: ""
+                    },
+                    new_url: "",
+                    test_url: "",
+                    test_status: false,
                     image_source: "",
                     product_model: new CretaProduct(params.id ? {id: params.id} : {})
                 },
-                method: {
+                methods: {
                     onUpdateData: function(){
-                        this.description = this.product_model.getDescription();
-                        this.$forceUpdate();
+                        this.product.name = this.product_model.getName();
+                        this.product.price = this.product_model.getPrice();
+                        // this.product.description = this.product_model.getDescription();
+                        $("#product_description").val(this.product_model.getDescription());
+                        this.product.images = this.product_model.getImages();
+                        this.product.type = this.product_model.getType();
+                    },
+                    add_image_url: function(url){
+                        this.product.images.push({
+                            url: url,
+                            name: ""
+                        });
+                    },
+                    delete_image_url: function(url){
+                        this.product.images.filter( image => {
+                            return ( image.url != url );
+                        })
+                        console.log(this.product.images);
+                    },
+                    test_image_url: function(image_url){
+                        console.log(image_url);
+                        this.test_url = image_url;
+                    },
+                    save_product: function(){
+                        if(!product_description){
+                            this.product.description = $("#product_description").val();
+                        } else {
+                            this.product.description = nicE.getContent();
+                            // console.log(question);
+                        }
+                        this.product_model.save(this.product, {
+                            success: function(){
+                                alert("Cập nhật thành công!")
+                            },
+                            error: function(e){
+                                console.log(e);
+                                alert("Lưu thất bại!");
+                            }
+                        });
+                    },
+                    delete_product: function(){
+                        this.product_model.destroy({
+                            success: function(){
+                                alert("Đã xóa!")
+                            },
+                            error: function(e){
+                                console.log(e);
+                                alert("Xóa thất bại");
+                            }
+                        });
                     }
+
                 },
                 created(){
                     var that = this;
                     
                     this.product_model.fetch({success: ()=>{
-                        this.description = this.product_model.getDescription();
+                        this.onUpdateData();
                         this.$forceUpdate();
                     }});
                     // var area2 = new nicEditor({fullPanel : true}).panelInstance('area2',{hasPanel : true});
