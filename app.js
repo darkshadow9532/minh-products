@@ -8,7 +8,7 @@ const fileUpload = require('express-fileupload');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
+var uploadRouter = require('./routes/upload');
 var app = express();
 // default options
 app.use(fileUpload());
@@ -42,6 +42,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/upload', uploadRouter)
 
 
 // API

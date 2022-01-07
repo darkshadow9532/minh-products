@@ -19,6 +19,17 @@ exports.create = (req, res) => {
         })
         return;
     }
+
+    if(req.body.images){
+        req.body.images.forEach(image => {
+            if(!image.type){
+                
+            } else if ( image.type == "GLOBAL") {
+                
+            }
+        })
+    }
+
     const model = new Model(createObj(req.body));
     model.save(model).then(data=>{
         res.send(data);

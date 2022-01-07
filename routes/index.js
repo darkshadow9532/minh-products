@@ -6,6 +6,7 @@ var controller = require("./controller/index.controller");
 router.get('/', controller.homepage);
 router.get('/dashboard', controller.dashboard);
 router.get("/detail", controller.detail);
+router.get("/products", controller.products);
 
 // Upload file
 router.post("/upload", controller.upload);

@@ -42,6 +42,9 @@ class CretaProduct extends Product {
     getType = () => {
         return this.get("type" || "");
     }
+    getId = () => {
+        return this.get("id" || "");
+    }
 }
 
 var CretaProducts = Backbone.Collection.extend({
@@ -66,9 +69,6 @@ class CretaProductsV2 {
         })
     }
     getByQuery = (query) => {
-        var query = {
-            "name" : "SAN PHAM THU NGHIEM"
-        }
         var that = this;
         that.products = [];
         $.get("/api/products?" + serialize(query), function(data){

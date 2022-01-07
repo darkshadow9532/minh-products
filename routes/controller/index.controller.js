@@ -11,6 +11,10 @@ exports.detail = (req, res) => {
     res.render('product/detail');
 }
 
+exports.products = (req, res) => {
+    res.render('product/products');
+}
+
 exports.upload = (req, res, next) => {
     let sampleFile;
     let uploadPath;

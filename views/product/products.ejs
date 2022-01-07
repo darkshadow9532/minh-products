@@ -1,0 +1,67 @@
+<html>
+    <head>
+        <%- include("../header.ejs") %>
+        <script src="/js/product/ModelProduct.js"></script>
+        <script src="/js/product/ModelFile.js"></script>
+    </head>
+    <body class="container-fluid">
+        <div>
+            <%- include("../menu.ejs"); %>
+        </div>
+        <h1>TẤT CẢ SẢN PHẨM</h1>
+        <div id="app" class="m-2">
+            <table class="table table-bordered">
+                <thead>
+                    <th>STT</th>
+                    <th>Tên SP</th>
+                    <th>Mô tả</th>
+                    <th>Giá lẻ</th>
+                    <th>Loại</th>
+                    <th>Hành động</th>
+                </thead>
+                <tbody>
+                    <template v-for=" (product, index) in product_collection.products">
+                        <tr>
+                            <td>{{ index }}</td>
+                            <td>{{ product.getName() }}</td>
+                            <td>{{ product.getDescription() }}</td>
+                            <td>{{ product.getPrice() }}</td>
+                            <td>{{ product.getType() }}</td>
+                            <td>
+                                <button class="btn btn-warning" @click="open_product(product.getId())">E</button>
+                                <!-- <button class="btn btn-danger" @click="delete_product(product)">X</button> -->
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+        <script>
+            var app = new Vue({
+                el: "#app",
+                data: {
+                    product_collection: new CretaProductsV2()
+                },
+                methods: {
+                    open_product: function(id){
+                        window.open("/detail?id=" + id, "_blank");
+                    },
+                    delete_product: function(product){
+                        var that = this;
+                        product.destroy({
+                            success: () => {
+                                console.log("hello");
+                            }
+                        })
+                    },
+                    onUpdateData: function(){
+                        
+                    }
+                },
+                created(){
+                    this.product_collection.getByQuery({});
+                }
+            })
+        </script>
+    </body>
+</html>

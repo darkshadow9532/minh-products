@@ -4,6 +4,8 @@
         <script src="/js/nicEdit.js"></script>
         <script src="/js/product/ModelProduct.js"></script>
         <script src="/js/product/ModelFile.js"></script>
+        
+        <script src="/js/product/component.js"></script>
         <script type="text/javascript">
             // bkLib.onDomLoaded(function() {
             //     var product_description = new nicEditor({fullPanel : true}).panelInstance('product_description');
@@ -29,9 +31,10 @@
                 <tr>
                     <td>Mô tả: </td>
                     <td>
-                        <textarea class="form-control" cols="100" rows="5" id="product_description"></textarea>
+                        <!-- <textarea class="form-control" cols="100" rows="5" id="product_description"></textarea> -->
+                        <editor :content="product_model.getDescription()" :nice="nice" @update_nice="nice = $event;"></editor>
                         </br>
-                        <button onClick="toggleArea2();">Chỉnh sửa với Editor</button>
+                        <!-- <button onClick="toggleArea2();">Chỉnh sửa với Editor</button> -->
                     </td>
                 </tr>
                 <tr>
@@ -67,7 +70,6 @@
         
         <script>
             var product_description;
-            var nicE;
             function toggleArea2() {
                 if(!product_description) {
                     product_description = new nicEditor({fullPanel : true}).panelInstance('product_description',{hasPanel : true});
@@ -107,7 +109,8 @@
                     test_url: "",
                     test_status: false,
                     image_source: "",
-                    product_model: new CretaProduct(params.id ? {id: params.id} : {})
+                    product_model: new CretaProduct(params.id ? {id: params.id} : {}),
+                    nice: {}
                 },
                 methods: {
                     onUpdateData: function(){
@@ -121,7 +124,8 @@
                     add_image_url: function(url){
                         this.product.images.push({
                             url: url,
-                            name: ""
+                            name: "",
+                            type: "GLOBAL"
                         });
                     },
                     delete_image_url: function(url){
